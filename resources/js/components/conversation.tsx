@@ -2,6 +2,7 @@ import StreamingIndicator from '@/components/streaming-indicator';
 import { cn } from '@/lib/utils';
 import { useEffect, useRef } from 'react';
 import AppLogo from './app-logo';
+import Markdown from './ui/markdown';
 
 type Message = {
     id?: number;
@@ -51,7 +52,8 @@ export default function Conversation({ messages, streamingData, isStreaming, str
                                 {message.type === 'prompt' && (index === messages.length - 1 || index === messages.length - 2) && streamId && (
                                     <StreamingIndicator id={streamId} className="absolute top-3 -left-8" />
                                 )}
-                                <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+                                {/* <p className="whitespace-pre-wrap text-sm">{message.content}</p> */}
+                                <Markdown>{message.content}</Markdown>
                             </div>
                         </div>
                     );
@@ -59,7 +61,11 @@ export default function Conversation({ messages, streamingData, isStreaming, str
                 {streamingData && (
                     <div className="relative">
                         <div className="inline-block max-w-[80%] rounded-lg p-3">
-                            <p className="whitespace-pre-wrap text-sm">{streamingData}</p>
+                            <div className="mb-4">
+                                <AppLogo />
+                            </div>
+                            {/* <p className="whitespace-pre-wrap text-sm">{streamingData}</p> */}
+                            <Markdown>{streamingData}</Markdown>
                         </div>
                     </div>
                 )}

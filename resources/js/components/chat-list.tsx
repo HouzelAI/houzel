@@ -206,7 +206,7 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
         <TooltipProvider>
             <div className="flex h-full flex-col">
                 <div className="flex flex-col gap-[12px]">
-                    <button className='inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:opacity-80 bg-[var(--Button-primary-white)] text-[var(--text-primary)] shadow-[0px_0.5px_3px_0px_var(--shadow-S)] hover:opacity-70 active:hover-60 h-[36px] px-[12px] rounded-[10px] gap-[6px] text-sm min-w-[36px] w-full' onClick={handleNewChat} disabled={createProcessing}>
+                    <button className='inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:opacity-80 bg-[var(--Button-primary-white)] text-[var(--text-primary)] shadow-[0px_0.5px_3px_0px_var(--shadow-S)] hover:opacity-70 active:hover-60 h-[36px] px-[12px] rounded-[10px] gap-[6px] text-sm min-w-[36px] w-full cursor-pointer' onClick={handleNewChat} disabled={createProcessing}>
                         <Plus className="h-4 w-4" />
                         <span className='text-sm font-medium text-[var(--text-primary)] whitespace-nowrap truncate'>Nova conversa</span>
                         <div className="flex items-center gap-0.5">
