@@ -31,7 +31,7 @@ class ChatFlowTest extends TestCase
 
         $chat = $user->chats->first();
         $this->assertNotNull($chat);
-        $this->assertEquals('Untitled', $chat->title); // Blank chat has "Untitled" title
+        $this->assertEquals('Sem título', $chat->title); // Blank chat has "Sem título" title
         $this->assertCount(0, $chat->messages); // No messages yet
 
         // Should redirect to the new chat page

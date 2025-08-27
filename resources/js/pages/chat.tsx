@@ -7,22 +7,9 @@ import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useStream } from '@laravel/stream-react';
-import { ArrowUp, Info } from 'lucide-react';
+import { ArrowUp, Info, ImagePlus, X, Paperclip } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-
-type Message = {
-    id?: number;
-    type: 'response' | 'error' | 'prompt';
-    content: string;
-};
-
-type ChatType = {
-    id: number;
-    title: string;
-    messages: Message[];
-    created_at: string;
-    updated_at: string;
-};
+import type { ChatType, Message } from '@/types/chat';
 
 type PageProps = {
     auth: {
@@ -40,11 +27,14 @@ type PageProps = {
 
 function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; auth: PageProps['auth']; flash: PageProps['flash'] }) {
     const [messages, setMessages] = useState<Message[]>(chat?.messages || []);
-    const [currentTitle, setCurrentTitle] = useState<string>(chat?.title || 'Untitled');
+    const [currentTitle, setCurrentTitle] = useState<string>(chat?.title || 'Sem título');
     const [shouldGenerateTitle, setShouldGenerateTitle] = useState<boolean>(false);
     const [isTitleStreaming, setIsTitleStreaming] = useState<boolean>(false);
     const [shouldUpdateSidebar, setShouldUpdateSidebar] = useState<boolean>(false);
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
+    const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [inputValue, setInputValue] = useState<string>('');
 
     const currentChatId = chat?.id || null;
@@ -79,8 +69,8 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
         if (!isStreaming && inputRef.current) {
             inputRef.current.focus();
             
-            // Trigger title generation if this is an authenticated user with "Untitled" chat and we have a response
-            if (auth.user && chat && currentTitle === 'Untitled' && data && data.trim()) {
+            // Trigger title generation if this is an authenticated user with "Sem título" chat and we have a response
+            if (auth.user && chat && currentTitle === 'Sem título' && data && data.trim()) {
                 setShouldGenerateTitle(true);
                 setShouldUpdateSidebar(true);
             }
@@ -94,19 +84,68 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
         }
     }, [chat?.title]);
 
-    // Track title state changes
+    // Parse images from messages if they come from database
     useEffect(() => {
-        // Title state tracking
-    }, [currentTitle, isTitleStreaming]);
+        if (chat?.messages) {
+            const parsedMessages: Message[] = chat.messages.map(message => ({
+                ...message,
+                images: message.images 
+                    ? Array.isArray(message.images) 
+                        ? message.images 
+                        : JSON.parse(message.images as string)
+                    : undefined
+            }));
+            setMessages(parsedMessages);
+        }
+    }, [chat?.messages]);
 
+    const handleImageUpload = async (files: FileList) => {
+        if (!files.length) return;
+
+        setIsUploadingImage(true);
+        
+        try {
+            const uploadPromises = Array.from(files).map(async (file) => {
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetch('/chat/upload-image', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    },
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Upload failed');
+                }
+
+                return result.url;
+            });
+
+            const uploadedUrls = await Promise.all(uploadPromises);
+            setSelectedImages(prev => [...prev, ...uploadedUrls]);
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            // You might want to show a toast notification here
+        } finally {
+            setIsUploadingImage(false);
+        }
+    };
+
+    const removeImage = (indexToRemove: number) => {
+        setSelectedImages(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
 
     const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
-        const input = form.querySelector('input') as HTMLInputElement;
+        const input = form.querySelector('input[type="text"]') as HTMLInputElement;
         const query = input?.value.trim();
 
-        if (!query) return;
+        if (!query && selectedImages.length === 0) return;
 
         const toAdd: Message[] = [];
 
@@ -118,10 +157,11 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
             });
         }
 
-        // Add the new prompt
+        // Add the new prompt with images
         toAdd.push({
             type: 'prompt',
-            content: query,
+            content: query || '',
+            images: selectedImages.length > 0 ? [...selectedImages] : undefined,
         });
 
         // Update local state
@@ -131,8 +171,10 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
         send({ messages: [...messages, ...toAdd] });
 
         input.value = '';
+        setInputValue('');
+        setSelectedImages([]);
         inputRef.current?.focus();
-    }, [send, data, messages]);
+    }, [send, data, messages, selectedImages]);
 
     return (
         <>
@@ -192,13 +234,6 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
                                 )}
                             </h1>
                         </div>
-                        {/* <div className="w-full max-w-full sm:max-w-[768px] sm:min-w-[390px] mx-auto p-6 max-sm:px-4 animate-home-chat-hidden">
-                            {(messages.length === 0 && auth.user) ? (
-                                <p className='text-foreground text-4xl mt-8 text-start libre-baskerville'>Olá {auth.user.name || auth.user.email},<br/><span className='text-muted-foreground'>Como posso ajudar você hoje?</span></p>
-                            ) : (
-                                <p className="text-foreground text-4xl mt-8 text-center libre-baskerville">O que posso fazer para você?</p>
-                            )}
-                        </div> */}
                     </div>
                 )}
 
@@ -206,6 +241,31 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
 
                 <div className="w-full max-w-full sm:max-w-[768px] sm:min-w-[390px] mx-auto p-6 max-sm:px-4 animate-home-chat-hidden">
                     <div className="flex flex-col gap-4 rounded-[22px] transition-all relative bg-[var(--fill-input-chat)] p-3 max-h-[300px] shadow-[0px_12px_32px_0px_rgba(0,0,0,0.02)] border border-black/8 dark:border-[#ffffff14]">
+                        
+                        {/* Image Preview Section */}
+                        {selectedImages.length > 0 && (
+                            <div className="flex flex-wrap gap-2 p-2 bg-muted/30 rounded-lg">
+                                {selectedImages.map((imageUrl, index) => (
+                                    <div key={index} className="relative group">
+                                        <img 
+                                            src={imageUrl} 
+                                            alt={`Upload ${index + 1}`}
+                                            className="w-16 h-16 object-cover rounded-md border"
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="sm"
+                                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={() => removeImage(index)}
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex-shrink-0">
                             <div className="mx-auto max-w-3xl">
                                 <form onSubmit={handleSubmit}>
@@ -229,14 +289,40 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
                                                 }
                                             }}
                                         />
-                                        <Button 
-                                            type="submit" 
-                                            id='send-button'
-                                            disabled={isStreaming || isFetching || !inputValue.trim()} 
-                                            className='rounded-full w-8 h-8 ms-auto p-0'
-                                        >
-                                            <ArrowUp />
-                                        </Button>
+                                        <div className="flex items-end gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="rounded-full border border-[var(--border-main)] inline-flex items-center justify-center gap-1 clickable cursor-pointer text-xs text-[var(--text-secondary)] hover:bg-[var(--fill-tsp-gray-main)] w-8 h-8 p-0 data-[popover-trigger]:bg-[var(--fill-tsp-gray-main)] shrink-0"
+                                                disabled={isUploadingImage || isStreaming || isFetching}
+                                                onClick={() => fileInputRef.current?.click()}
+                                            >
+                                                <Paperclip className="w-4 h-4" />
+                                            </Button>
+                                            
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    if (e.target.files) {
+                                                        handleImageUpload(e.target.files);
+                                                    }
+                                                }}
+                                            />
+
+                                            <Button 
+                                                type="submit" 
+                                                id='send-button'
+                                                disabled={isStreaming || isFetching || (!inputValue.trim() && selectedImages.length === 0)} 
+                                                className='rounded-full w-8 h-8 ms-auto p-0'
+                                            >
+                                                <ArrowUp />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>

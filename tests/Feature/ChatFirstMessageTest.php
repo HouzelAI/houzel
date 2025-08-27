@@ -46,8 +46,8 @@ class ChatFirstMessageTest extends TestCase
         $this->assertCount(1, $user->chats);
 
         $chat = $user->chats->first();
-        // Initially the chat will have "Untitled" title, title generation happens after streaming
-        $this->assertEquals('Untitled', $chat->title);
+        // Initially the chat will have "Sem título" title, title generation happens after streaming
+        $this->assertEquals('Sem título', $chat->title);
     }
 
     public function test_blank_chat_creation_without_first_message(): void
@@ -64,7 +64,7 @@ class ChatFirstMessageTest extends TestCase
         $this->assertCount(1, $user->chats);
 
         $chat = $user->chats->first();
-        $this->assertEquals('Untitled', $chat->title);
+        $this->assertEquals('Sem título', $chat->title);
         $this->assertCount(0, $chat->messages);
     }
 

@@ -12,4 +12,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/chat/{chat}', [ChatController::class, 'destroy'])->name('chat.destroy');
     Route::post('/chat/{chat}/stream', [ChatController::class, 'stream'])->name('chat.show.stream');
     Route::get('/chat/{chat}/title-stream', [ChatController::class, 'titleStream'])->name('chat.title.stream');
+    Route::post('/chat/upload-image', [ChatController::class, 'uploadImage'])->name('chat.upload-image');
 });

@@ -214,12 +214,12 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                             <span className="flex justify-center items-center w-5 h-5 px-1 rounded-[4px] bg-[var(--fill-tsp-white-light)] border border-[var(--border-light)] text-sm font-normal text-[var(--text-tertiary)] ">K</span>
                         </div>
                     </button>
-                    <div className={cn('mb-2 w-fit flex justify-center items-center clickable rounded-[999px] px-[12px] py-[7px] border-none outline-offset-0 outline-[var(--border-dark)] text-[13px] leading-[18px] bg-[var(--tab-active-black)] text-[var(--text-onblack)] outline-none outline-0', state === 'collapsed' ? 'justify-center' : 'justify-between')}>
+                    {/* <div className={cn('mb-2 w-fit flex justify-center items-center clickable rounded-[999px] px-[12px] py-[7px] border-none outline-offset-0 outline-[var(--border-dark)] text-[13px] leading-[18px] bg-[var(--tab-active-black)] text-[var(--text-onblack)] outline-none outline-0', state === 'collapsed' ? 'justify-center' : 'justify-between')}>
                         {state === 'expanded' && <h3 className="text-sm font-normal">Todos</h3>}
-                    </div>
+                    </div> */}
                 </div>
 
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1 mt-2">
                     <div className={cn('space-y-1', state === 'collapsed' && 'flex flex-col items-center')}>
                         {loading && chats.length === 0
                             ? state === 'expanded' && <p className="text-muted-foreground py-2 text-sm">Loading...</p>
@@ -298,27 +298,27 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                         )}
                                                     >
                                                         <div className="relative">
-                                                            <div className="h-8 w-8 rounded-full flex items-center justify-center relative bg-[var(--icon-primary)]">
-                                                                <div className="relative overflow-hidden h-4 w-4 object-cover opacity-100 brightness-100 dark:brightness-0">
-                                                                    <MessageSquare fill="true" className="h-4 w-4 flex-shrink-0" />
+                                                            <div className="h-8 w-8 rounded-full flex items-center justify-center relative bg-[#3C3C3D]">
+                                                                <div className="relative overflow-hidden h-4 w-4 object-cover opacity-100 brightness-100 dark:brightness-100">
+                                                                    <MessageSquare fill="true" className="h-4 w-4 flex-shrink-0 fill-[#FFF]" />
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="max-w-[140px] truncate text-sm font-medium">{chat.title}</span>
-                                                            <span className="max-w-[140px] truncate text-xs font-medium">
+                                                        <div className="flex flex-col w-full">
+                                                            <span className="max-w-[160px] truncate text-sm font-medium">{chat.title}</span>
+                                                            <span className="max-w-[160px] truncate text-xs font-medium">
                                                                 {formatDistance(chat.created_at, new Date(), { addSuffix: true, locale: ptLocale })}
                                                             </span>
                                                         </div>
                                                         {/* Fade overlay for long titles */}
-                                                        <div
+                                                        {/* <div
                                                             className={cn(
                                                                 'pointer-events-none absolute top-0 right-16 bottom-0 w-8 bg-gradient-to-l to-transparent transition-colors',
                                                                 currentChatId === chat.id
                                                                     ? 'from-[var(--background-white-main)]'
                                                                     : 'from-sidebar group-hover/chat:from-[var(--color-sidebar)]',
                                                             )}
-                                                        />
+                                                        /> */}
                                                     </Link>
 
                                                     {/* Edit and Delete buttons - only visible on hover of this specific chat */}
@@ -327,7 +327,7 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-6 w-6 opacity-0 transition-all duration-200 group-hover/chat:opacity-100 hover:bg-green-50 dark:hover:bg-green-950/20 cursor-pointer"
-                                                            onClick={(e) => handleEditClick(chat.id, chat.title || 'Untitled Chat', e)}
+                                                            onClick={(e) => handleEditClick(chat.id, chat.title || 'Conversa sem título', e)}
                                                         >
                                                             <Pencil className="text-muted-foreground h-3 w-3 transition-colors hover:text-green-600" />
                                                         </Button>
@@ -336,9 +336,9 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    className="hover:bg-destructive/10 h-6 w-6 opacity-0 transition-all duration-200 group-hover/chat:opacity-100"
+                                                                    className="hover:bg-destructive/10 h-6 w-6 opacity-0 transition-all duration-200 group-hover/chat:opacity-100 cursor-pointer"
                                                                 >
-                                                                    <Trash2 className="text-muted-foreground hover:text-destructive h-3 w-3 transition-colors" />
+                                                                    <Trash2 className="text-muted-foreground hover:text-destructive cursor-pointer h-3 w-3 transition-colors" />
                                                                 </Button>
                                                             </AlertDialogTrigger>
                                                             <AlertDialogContent>
@@ -353,7 +353,7 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                                     <AlertDialogAction
                                                                         onClick={() => handleDeleteChat(chat.id)}
-                                                                        className="bg-destructive hover:bg-destructive/90 focus:ring-destructive text-white"
+                                                                        className="bg-destructive hover:bg-destructive/90 focus:ring-destructive text-white cursor-pointer"
                                                                     >
                                                                         Delete
                                                                     </AlertDialogAction>

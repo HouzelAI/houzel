@@ -15,10 +15,12 @@ class Message extends Model
         'chat_id',
         'type',
         'content',
+        'images',
     ];
 
     protected $casts = [
         'type' => 'string',
+        'images' => 'array',
     ];
 
     protected $appends = ['saved'];

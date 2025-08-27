@@ -19,7 +19,7 @@ class ChatController extends Controller
             ->map(function ($chat) {
                 return [
                     'id' => $chat->id,
-                    'title' => $chat->title ?? 'Untitled Chat',
+                    'title' => $chat->title ?? 'Conversa sem título',
                     'created_at' => $chat->created_at,
                     'updated_at' => $chat->updated_at,
                 ];
