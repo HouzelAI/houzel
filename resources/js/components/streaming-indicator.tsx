@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { useStream } from '@laravel/stream-react';
+import { TextShimmer } from './motion-primitives/text-shimmer';
 
 interface StreamingIndicatorProps {
     id: string;
@@ -14,7 +15,10 @@ export default function StreamingIndicator({ id, className }: StreamingIndicator
     // }
 
     if (isFetching) {
-        return <div className={cn('size-2 animate-pulse rounded-full bg-yellow-500', className)} />;
+        return <>
+            <TextShimmer className={cn('text-sm', className)} duration={1}>Pensando...</TextShimmer>
+        </>
+        // return <div className={cn('size-2 animate-pulse rounded-full bg-yellow-500', className)} />;
     }
 
     return null;

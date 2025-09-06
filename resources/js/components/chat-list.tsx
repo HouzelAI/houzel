@@ -16,7 +16,7 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
-import { useSidebar } from './ui/sidebar';
+import { SidebarTrigger, useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { formatDistance } from "date-fns";
 import { pt as ptLocale } from 'date-fns/locale';
@@ -206,14 +206,20 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
         <TooltipProvider>
             <div className="flex h-full flex-col">
                 <div className="flex flex-col gap-[12px]">
-                    <button className='inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:opacity-80 bg-[var(--Button-primary-white)] text-[var(--text-primary)] shadow-[0px_0.5px_3px_0px_var(--shadow-S)] hover:opacity-70 active:hover-60 h-[36px] px-[12px] rounded-[10px] gap-[6px] text-sm min-w-[36px] w-full cursor-pointer' onClick={handleNewChat} disabled={createProcessing}>
-                        <Plus className="h-4 w-4" />
-                        <span className='text-sm font-medium text-[var(--text-primary)] whitespace-nowrap truncate'>Nova conversa</span>
-                        <div className="flex items-center gap-0.5">
-                            <span className="flex text-[var(--text-tertiary)] justify-center items-center min-w-5 h-5 px-1 rounded-[4px] bg-[var(--fill-tsp-white-light)] border border-[var(--border-light)]"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-command"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg></span>
-                            <span className="flex justify-center items-center w-5 h-5 px-1 rounded-[4px] bg-[var(--fill-tsp-white-light)] border border-[var(--border-light)] text-sm font-normal text-[var(--text-tertiary)] ">K</span>
-                        </div>
-                    </button>
+                    <SidebarTrigger className='w-9 h-9 cursor-pointer' />
+                    
+                    { state != 'collapsed' && (
+                        <button className='inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:opacity-80 bg-[var(--Button-primary-white)] text-[var(--text-primary)] shadow-[0px_0.5px_3px_0px_var(--shadow-S)] hover:opacity-70 active:hover-60 h-[36px] px-[12px] rounded-[10px] gap-[6px] text-sm min-w-[36px] w-full cursor-pointer' onClick={handleNewChat} disabled={createProcessing}>
+                            <Plus className="h-4 w-4" />
+                            <span className='text-sm font-medium text-[var(--text-primary)] whitespace-nowrap truncate'>
+                                Nova correção
+                            </span>
+                            <div className="flex items-center gap-0.5">
+                                <span className="flex text-[var(--text-tertiary)] justify-center items-center min-w-5 h-5 px-1 rounded-[4px] bg-[var(--fill-tsp-white-light)] border border-[var(--border-light)]"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-command"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg></span>
+                                <span className="flex justify-center items-center w-5 h-5 px-1 rounded-[4px] bg-[var(--fill-tsp-white-light)] border border-[var(--border-light)] text-sm font-normal text-[var(--text-tertiary)] ">K</span>
+                            </div>
+                        </button>
+                    )}
                     {/* <div className={cn('mb-2 w-fit flex justify-center items-center clickable rounded-[999px] px-[12px] py-[7px] border-none outline-offset-0 outline-[var(--border-dark)] text-[13px] leading-[18px] bg-[var(--tab-active-black)] text-[var(--text-onblack)] outline-none outline-0', state === 'collapsed' ? 'justify-center' : 'justify-between')}>
                         {state === 'expanded' && <h3 className="text-sm font-normal">Todos</h3>}
                     </div> */}
@@ -236,13 +242,13 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                         prefetch="hover"
                                                         cacheFor="5m"
                                                         className={cn(
-                                                            'flex h-6 w-6 items-center justify-center rounded transition-colors',
+                                                            'flex h-9 w-9 items-center justify-center rounded-[8px] transition-colors',
                                                             currentChatId === chat.id
-                                                                ? 'bg-accent text-accent-foreground'
-                                                                : 'hover:bg-accent hover:text-accent-foreground',
+                                                                ? 'bg-[#161618] text-accent-foreground'
+                                                                : 'hover:bg-[#161618] hover:text-accent-foreground',
                                                         )}
                                                     >
-                                                        <MessageSquare className="h-4 w-4" />
+                                                        <MessageSquare className={currentChatId === chat.id ? "h-4 w-4" : "opacity-50 h-4 w-4"} fill={currentChatId === chat.id ? 'white' : 'white'} stroke={currentChatId === chat.id ? 'white' : 'white'} />
                                                     </Link>
                                                 </TooltipTrigger>
                                                 <TooltipContent side="right">
@@ -257,8 +263,14 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                         <div key={chat.id} className="group/chat relative">
                                             {editingChatId === chat.id ? (
                                                 // Edit mode
-                                                <div className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm">
-                                                    <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                                                <div className="py-1.5 text-sm group flex h-14 cursor-pointer items-center gap-2 rounded-[10px] px-2 transition-colors">
+                                                    <div className="relative">
+                                                        <div className="h-8 w-8 rounded-full flex items-center justify-center relative bg-[#3C3C3D]">
+                                                            <div className="relative overflow-hidden h-4 w-4 object-cover opacity-100 brightness-100 dark:brightness-100">
+                                                                <MessageSquare fill="true" className="h-4 w-4 flex-shrink-0 fill-[#FFF]" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <Input
                                                         ref={editInputRef}
                                                         value={data.title}
@@ -270,7 +282,7 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                                 cancelEditing();
                                                             }
                                                         }}
-                                                        className="h-6 flex-1 text-xs"
+                                                        className="flex-1 text-xs border-0 shadow-none focus:ring-0 focus-visible:ring-0 bg-transparent h-8 px-0"
                                                     />
                                                     <Button
                                                         variant="ghost"
@@ -306,7 +318,7 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                         </div>
                                                         <div className="flex flex-col w-full">
                                                             <span className="max-w-[160px] truncate text-sm font-medium">{chat.title}</span>
-                                                            <span className="max-w-[160px] truncate text-xs font-medium">
+                                                            <span className="max-w-[160px] truncate text-xs font-normal text-muted-foreground">
                                                                 {formatDistance(chat.created_at, new Date(), { addSuffix: true, locale: ptLocale })}
                                                             </span>
                                                         </div>

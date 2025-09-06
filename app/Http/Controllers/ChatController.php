@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chat;
+use App\Services\RedacaoCompilerService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 class ChatController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(private RedacaoCompilerService $redacaoCompiler) {}
 
     public function index()
     {
@@ -164,28 +167,23 @@ class ChatController extends Controller
                 return;
             }
 
-            // Only save messages if we have an existing chat (authenticated user with saved chat)
             if ($chat) {
                 foreach ($messages as $message) {
-                    // Only save if message doesn't have an ID (not from database)
                     if (! isset($message['id'])) {
                         $chat->messages()->create([
-                            'type' => $message['type'],
+                            'type'    => $message['type'],
                             'content' => $message['content'],
-                            'images' => isset($message['images']) ? json_encode($message['images']) : null,
-                        ]);
+                            'images'  => $message['images'] ?? null,
+                        ]);                        
                     }
                 }
             }
 
-            // Prepare messages for OpenAI with system context
             $openAIMessages = $this->prepareMessagesForOpenAI($messages, $chat);
 
-            // Stream response from OpenAI
             $fullResponse = '';
 
             if (app()->environment('testing') || ! config('openai.api_key')) {
-                // Mock response for testing or when API key is not set
                 $hasImages = collect($messages)->some(fn($m) => isset($m['images']) && !empty($m['images']));
                 $fullResponse = $hasImages 
                     ? 'Olá! Eu sou o Houzel. Vejo que você enviou imagens junto com seu texto. Como corretor de redações, posso analisar textos escritos nas imagens e fornecer feedback sobre a escrita. Como posso ajudá-lo a melhorar sua redação?'
@@ -219,14 +217,81 @@ class ChatController extends Controller
                 }
             }
 
-            // Save the AI response to database if authenticated
             if ($chat && $fullResponse) {
-                $chat->messages()->create([
-                    'type' => 'response',
+                // 1) Salva a resposta do modelo
+                $responseMsg = $chat->messages()->create([
+                    'type'    => 'response',
                     'content' => $fullResponse,
                 ]);
-
-                // Generate title if this is a new chat with "Sem título" title
+            
+                try {
+                    // 2) Compila
+                    $compiled = $this->redacaoCompiler->compile(
+                        userInput: 'Forneça FEEDBACK detalhado e notas no padrão ENEM para o texto a seguir.',
+                        redacaoTexto: $fullResponse
+                    );
+            
+                    $compiledSystem = (string)($compiled['system'] ?? '');
+                    $compiledPrompt = (string)($compiled['prompt'] ?? 'Avalie o texto a seguir com foco em ENEM (competências 1-5).');
+                    $compiledTemp   = is_numeric($compiled['temperature'] ?? null) ? (float)$compiled['temperature'] : 0.25;
+                    $compiledMaxTok = is_numeric($compiled['max_tokens']  ?? null) ? (int)$compiled['max_tokens']  : 1200;
+            
+                    if ($compiledSystem === '') {
+                        $compiledSystem = 'Você é um avaliador de redações no padrão ENEM. Dê notas por competência e justificativas específicas.';
+                    }
+            
+                    // 3) Gera feedback
+                    if (!(app()->environment('testing') || ! config('openai.api_key'))) {
+                        $feedbackResponse = OpenAI::chat()->create([
+                            'model'       => 'gpt-4o',
+                            'messages'    => [
+                                ['role' => 'system', 'content' => $compiledSystem],
+                                ['role' => 'user',   'content' => $compiledPrompt],
+                            ],
+                            'temperature' => $compiledTemp,
+                            'max_tokens'  => $compiledMaxTok,
+                        ]);
+            
+                        $feedbackText = trim($feedbackResponse->choices[0]->message->content ?? '');
+                    } else {
+                        $feedbackText = "Feedback (mock): texto avaliado; coerência boa; coesão regular; gramática ok; nota estimada 840.";
+                    }
+            
+                    // 4) Persistência + SSE
+                    if (!empty($feedbackText)) {
+                        $payload = [
+                            'type'        => 'compiler_feedback',
+                            'prompt'      => $compiled['prompt'] ?? null,
+                            'system'      => $compiled['system'] ?? null,
+                            'temperature' => $compiled['temperature'] ?? null,
+                            'max_tokens'  => $compiled['max_tokens'] ?? null,
+                            'context'     => $compiled['context'] ?? null,
+                            'confidence'  => $compiled['confidence'] ?? null,
+                            'suggestions' => $compiled['suggestions'] ?? [],
+                            'feedbackText'=> $feedbackText, // <-- adicionado
+                        ];
+            
+                        // Salva a mensagem de feedback vinculada à resposta
+                        $chat->messages()->create([
+                            'type'      => 'feedback',
+                            'content'   => $feedbackText,
+                            'parent_id' => $responseMsg->id,
+                            'meta'      => $payload,
+                        ]);
+            
+                        // Imprime uma única vez no stream + payload para o front ler
+                        echo "\n\n\n---\n\n**Feedback automático sobre o texto gerado:**\n\n";
+                        echo $feedbackText;
+                        echo "\n\n<!--FEEDBACK_JSON:" . json_encode($payload) . "-->\n\n";
+                        ob_flush(); flush();
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Erro ao gerar feedback via compilador/LLM: '.$e->getMessage(), [
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                }
+            
+                // título...
                 info('Checking if should generate title', ['chat_title' => $chat->title]);
                 if ($chat->title === 'Sem título') {
                     info('Generating title in background for chat', ['chat_id' => $chat->id]);
@@ -234,7 +299,7 @@ class ChatController extends Controller
                 } else {
                     info('Not generating title', ['current_title' => $chat->title]);
                 }
-            }
+            }            
         }, 200, [
             'Cache-Control' => 'no-cache',
             'Content-Type' => 'text/event-stream',

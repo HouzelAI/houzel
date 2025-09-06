@@ -36,10 +36,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Entre na Houzel" description="Sem lista de espera — comece agora">
+        <AuthLayout title="Boas vindas à Houzel" description="Sem lista de espera — comece agora">
             <Head title="Log in" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
+            <form className="flex flex-col gap-3" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email" className='text-[13px] text-white font-medium after:content-[&quot;*&quot;] after:text-[var(--function-error)] after:ml-[4px]'>Email</Label>
@@ -51,7 +51,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             tabIndex={1}
                             autoComplete="email"
                             value={data.email}
-                            className='rounded-[10px] overflow-hidden text-sm leading-[22px] text-[var(--text-primary)] h-10 disabled:cursor-not-allowed placeholder:text-[var(--text-disable)] bg-[var(--fill-input-chat)] pt-1 pr-1.5 pb-1 pl-3 focus:ring-[1.5px] focus:ring-[var(--border-dark)] w-full'
+                            className='rounded-[10px] overflow-hidden text-sm leading-[22px] text-[#dadada] h-10 disabled:cursor-not-allowed placeholder:text-[var(--text-disable)] bg-[#363537] border-[#363537] pt-1 pr-1.5 pb-1 pl-3 focus:ring-[1.5px] focus:ring-[#363537] w-full'
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="email@example.com"
                         />
@@ -74,7 +74,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             tabIndex={2}
                             autoComplete="current-password"
                             value={data.password}
-                            className='rounded-[10px] overflow-hidden text-sm leading-[22px] text-[var(--text-primary)] h-10 disabled:cursor-not-allowed placeholder:text-[var(--text-disable)] bg-[var(--fill-input-chat)] pt-1 pr-1.5 pb-1 pl-3 focus:ring-[1.5px] focus:ring-[var(--border-dark)] w-full'
+                            className='rounded-[10px] overflow-hidden text-sm leading-[22px] text-[#dadada] h-10 disabled:cursor-not-allowed placeholder:text-[var(--text-disable)] bg-[#363537] border-[#363537] pt-1 pr-1.5 pb-1 pl-3 focus:ring-[1.5px] focus:ring-[#363537] w-full'
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"
                         />
@@ -92,7 +92,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <Label htmlFor="remember" className='text-white'>Lembrar de mim</Label>
                     </div>
 
-                    <Button type="submit" className="mt-4 inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors bg-[var(--Button-primary-black)] text-[var(--text-onblack)] h-[40px] px-[16px] rounded-[10px] gap-[6px] text-sm min-w-16 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:opacity-50 active:opacity-50 w-full disabled:bg-[#898988] dark:disabled:bg-[#939393]" tabIndex={4} disabled={processing}>
+                    <Button type="submit" className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors bg-[var(--Button-primary-black)] text-[var(--text-onblack)] h-[40px] px-[16px] rounded-[10px] gap-[6px] text-sm min-w-16 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:opacity-50 active:opacity-50 w-full disabled:bg-[#898988] dark:disabled:bg-[#939393]" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Log in
                     </Button>
