@@ -1,5 +1,5 @@
 <p align="right">
-    <b>Português</b> | <a href="./README.en.md">English</a>
+    <a href="./README.md">Português</a> | <b>English</b>
 </p>
 
 # Houzel – Essay Correction with Interactive Chat

@@ -1,5 +1,5 @@
 <p align="right">
-    <a href="./README.md">Português</a> | <b>English</b>
+  <b>Português</b> | <a href="./README.en.md">English</a>
 </p>
 
 # Houzel – Corretor de Redações com Chat Interativo
