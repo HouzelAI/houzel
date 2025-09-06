@@ -330,12 +330,6 @@ function ChatWithStream({ chat, auth, flash }: { chat: ChatType | undefined; aut
                                         <Forward width={18} className='text-muted-foreground' />
                                         <span className='text-[var(--text-secondary)] text-sm font-medium'>Compartilhar</span>
                                     </button>
-                                    <div className="size-[28px] clickable hover:bg-[var(--fill-tsp-white-dark)] rounded-lg flex items-center justify-center hover:cursor-pointer">
-                                        <FileSearch width={18} className='text-muted-foreground' />
-                                    </div>
-                                    <div className="size-[28px] clickable hover:bg-[var(--fill-tsp-white-dark)] rounded-lg flex items-center justify-center hover:cursor-pointer">
-                                        <Star width={18} className='text-muted-foreground' />
-                                    </div>
                                     <HoverCard openDelay={0}>
                                         <HoverCardTrigger>
                                             <div className="size-[28px] clickable hover:bg-[var(--fill-tsp-white-dark)] rounded-lg flex items-center justify-center hover:cursor-pointer">

@@ -1,3 +1,11 @@
+<p align="center">
+
+  <a href="https://polar.sh">
+    <img src="https://gist.github.com/user-attachments/assets/76405a13-8fa1-45c2-9afb-13088c1baddc" alt="houzel-cover" />
+  </a>
+
+</p>
+
 <p align="right">
     <a href="./README.md">Português</a> | <b>English</b>
 </p>

@@ -265,9 +265,17 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                 // Edit mode
                                                 <div className="py-1.5 text-sm group flex h-14 cursor-pointer items-center gap-2 rounded-[10px] px-2 transition-colors">
                                                     <div className="relative">
-                                                        <div className="h-8 w-8 rounded-full flex items-center justify-center relative bg-[#3C3C3D]">
+                                                        <div className={
+                                                            currentChatId === chat.id 
+                                                                ? "h-8 w-8 rounded-full flex items-center justify-center relative bg-[#DADADA]" 
+                                                                : "h-8 w-8 rounded-full flex items-center justify-center relative bg-[#3C3C3D]"
+                                                            }>
                                                             <div className="relative overflow-hidden h-4 w-4 object-cover opacity-100 brightness-100 dark:brightness-100">
-                                                                <MessageSquare fill="true" className="h-4 w-4 flex-shrink-0 fill-[#FFF]" />
+                                                                <MessageSquare fill="true" className={
+                                                                    currentChatId === chat.id
+                                                                    ? "h-4 w-4 flex-shrink-0 fill-[#000]"
+                                                                    : "h-4 w-4 flex-shrink-0 fill-[#FFF]"
+                                                                } />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -310,9 +318,17 @@ export default function ChatList({ currentChatId, isAuthenticated }: ChatListPro
                                                         )}
                                                     >
                                                         <div className="relative">
-                                                            <div className="h-8 w-8 rounded-full flex items-center justify-center relative bg-[#3C3C3D]">
+                                                            <div className={
+                                                                currentChatId === chat.id 
+                                                                    ? "h-8 w-8 rounded-full flex items-center justify-center relative bg-[#DADADA]" 
+                                                                    : "h-8 w-8 rounded-full flex items-center justify-center relative bg-[#3C3C3D]"
+                                                                }>
                                                                 <div className="relative overflow-hidden h-4 w-4 object-cover opacity-100 brightness-100 dark:brightness-100">
-                                                                    <MessageSquare fill="true" className="h-4 w-4 flex-shrink-0 fill-[#FFF]" />
+                                                                    <MessageSquare fill="true" className={
+                                                                        currentChatId === chat.id
+                                                                        ? "h-4 w-4 flex-shrink-0 fill-[#000] stroke-[#000]"
+                                                                        : "h-4 w-4 flex-shrink-0 fill-[#FFF] fill-[#000]"
+                                                                    } />
                                                                 </div>
                                                             </div>
                                                         </div>
