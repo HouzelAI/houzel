@@ -1,9 +1,7 @@
 <p align="center">
-
-  <a href="https://polar.sh">
-    <img src="https://gist.github.com/user-attachments/assets/76405a13-8fa1-45c2-9afb-13088c1baddc" alt="houzel-cover" />
+  <a href="https://houzel.com.br">
+    <img src="https://github.com/HouzelAI/houzel/blob/main/public/assets/img/houzel-cover.png" />
   </a>
-
 </p>
 
 <p align="right">
