@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "framework": null,
+  "functions": {
+    "api/index.php": { "runtime": "vercel-php@0.6.0" }
+  },
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.php" }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_KEY": "base64:4kR+kNj9yFkKb6u4gAqC94V4Xx90d6m74w8d12p3",
+    "APP_NAME": "Houzel",
+    "APP_URL": "https://houzel.vercel.app"
+  }
+}

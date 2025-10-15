@@ -140,7 +140,7 @@ export default function Conversation({
                                                             <img
                                                                 src={imageUrl}
                                                                 alt={`Imagem ${imageIndex + 1}`}
-                                                                className="w-full h-full object-cover"
+                                                                className="w-full h-[800px] object-contain"
                                                                 loading="lazy"
                                                             />
                                                             <DialogClose className='bg-black h-8 w-8 rounded-4xl flex items-center justify-center cursor-pointer' />

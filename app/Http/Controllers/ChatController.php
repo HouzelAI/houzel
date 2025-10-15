@@ -28,6 +28,8 @@ class ChatController extends Controller
             ]);
 
             return redirect()->route('chat.show', $chat);
+        } else {
+            return redirect()->route('login');
         }
 
         // For unauthenticated users, show the blank chat page
